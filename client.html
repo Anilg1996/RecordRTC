@@ -1,0 +1,31 @@
+<!-- index.html -->
+<script src="https://cdn.webrtc-experiment.com/RecordRTC.js"></script>
+<script>
+  const startButton = document.getElementById('startButton');
+  const stopButton = document.getElementById('stopButton');
+  const recorder = new RecordRTC(mediaStream, {
+    type: 'video',
+    mimeType: 'video/wav'
+  });
+
+  startButton.addEventListener('click', () => {
+    recorder.startRecording();
+  });
+
+  stopButton.addEventListener('click', async () => {
+    recorder.stopRecording(async () => {
+      const blob = recorder.getBlob();
+      const formData = new FormData();
+      formData.append('data', blob);
+      try {
+        await fetch('/api/save-recording', {
+          method: 'POST',
+          body: formData
+        });
+        console.log('Recording saved successfully');
+      } catch (error) {
+        console.error('Error saving recording:', error);
+      }
+    });
+  });
+</script>
